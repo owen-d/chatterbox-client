@@ -4,17 +4,51 @@
     <meta charset="utf-8">
     <title>chatterbox</title>
     <link rel="stylesheet" href="styles/styles.css">
+  </head>
+
+  <body>
+
+    <div id="main">
+
+      <header>
+        <h1>Chatterbox</h1>
+      </header>
+
+      <aside class="navigation">
+        <div class="friends">
+          <h3 class="friends-header">Friends</h3>
+          <ul>
+            <li>test1</li>
+            <li>test2</li>
+          </ul>
+        </div>
+
+        <div class="rooms">
+          <h3 class="rooms-header">Rooms</h3>
+          <ul>
+            <li>test1</li>
+            <li>test2</li>
+          </ul>
+        </div>
+      </aside>
+
+      <section class="messages">
+        <h3 class="messages-header">Current Room</h3>
+        <div class="msg-container">
+          <p>test1</p>
+          <p>test2</p>
+        </div>
+      </section>
+
+    </div>
 
     <!-- dependencies -->
     <script src="bower_components/jquery/jquery.min.js"></script>
+    <script src="bower_components/underscore/underscore-min.js"></script>
+
     <!-- your scripts -->
     <script src="env/config.js"></script>
     <script src="scripts/app.js"></script>
-  </head>
-  <body>
-    <div id="main">
-      <h1>chatterbox</h1>
-      <!-- Your HTML goes here! -->
-    </div>
   </body>
+
 </html>
