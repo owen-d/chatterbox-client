@@ -6,10 +6,15 @@ var app = {
   getMessageData: null,
   username: null,
   friends: [],
-  // escapeChars: /\w+/ig,
+  rooms: ['lobby'],
+  currentRoom: 'lobby',
 
   init: function(){
     setInterval(this.fetch.bind(this), 1500);
+  },
+
+  changeRoom: function(){
+    $('.messages-header').text(app.currentRoom+ ' Messages');
   },
 
   display: function(){
@@ -21,11 +26,15 @@ var app = {
       var user = encodeURIComponent(messages.results[i].username);
       var message = encodeURIComponent(messages.results[i].text);
       if (this.friends.indexOf(user) !== -1) {
-        message = '<div class=""><a href="#"><strong>'+ user + '</strong></a>: ' + message + '</div>';
+        message = '<div class=""><strong><a href="#">'+ user + '</a>: ' + message + '</strong></div>';
       } else {
         message = '<div class=""><a href="#">'+ user + '</a>: ' + message + '</div>';
       }
-      $('.messages-container').append(message);
+      if (app.currentRoom === 'lobby') {
+        $('.messages-container').append(message);
+      } else if (messages.results[i].room === app.currentRoom) {
+        $('.messages-container').append(message);
+      }
     }
   },
 
@@ -51,6 +60,7 @@ var app = {
   createJSON: function(){
     var result = {};
     result.username = app.username;
+    result.room = app.currentRoom;
     result.text = $('.send-message').val();
     console.log(result.text);
     result.roomname = undefined; // TODO
@@ -97,13 +107,15 @@ $(document).ready(function(){
                  +'</button></div>';
 
       $('#rooms-list').append(room);
+      app.rooms.push($(this).val())
       $(this).val('');
     }
   });
 
   $(document).on('click', '.delete', function(e){
     $(this).parent().remove();
-    app.friends.splice(app.friends.indexOf($(this).parent().first('li').text()), 1)
+    app.friends.splice(app.friends.indexOf($(this).parent().first('li').text()), 1);
+    app.rooms.splice(app.rooms.indexOf($(this).parent().first('a').text()), 1);
   });
 
   // TODO: FIX ADDING FRIENDS REPEATEDLY
@@ -124,6 +136,11 @@ $(document).ready(function(){
     // if (!$('#friends-list:contains('+$(this).text()+')')) {
     //   $('#friends-list').append(friend);
     // }
+  });
+
+  $('#rooms-list').on('click', 'a', function(){
+    app.currentRoom = $(this).text();
+    app.changeRoom();
   });
 
 });
