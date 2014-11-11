@@ -5,10 +5,11 @@ var app = {
   postMessageData: null,
   getMessageData: null,
   username: null,
+  friends: [],
   // escapeChars: /\w+/ig,
 
-  initialize: function(){
-    setInterval(this.fetch.bind(this), 3000);
+  init: function(){
+    setInterval(this.fetch.bind(this), 1500);
   },
 
   display: function(){
@@ -19,7 +20,11 @@ var app = {
     for (var i = 0; i < messages.results.length; i++) {
       var user = encodeURIComponent(messages.results[i].username);
       var message = encodeURIComponent(messages.results[i].text);
-      message = '<div class="">'+ user + ': ' + message + '</div>';
+      if (this.friends.indexOf(user) !== -1) {
+        message = '<div class=""><a href="#"><strong>'+ user + '</strong></a>: ' + message + '</div>';
+      } else {
+        message = '<div class=""><a href="#">'+ user + '</a>: ' + message + '</div>';
+      }
       $('.messages-container').append(message);
     }
   },
@@ -43,7 +48,7 @@ var app = {
     });
   },
 
-  createJSONMessage: function(){
+  createJSON: function(){
     var result = {};
     result.username = app.username;
     result.text = $('.send-message').val();
@@ -52,7 +57,7 @@ var app = {
     app.postMessageData = result;
   },
 
-  postJSON: function(){
+  send: function(){
     $.ajax({
       url: 'https://api.parse.com/1/classes/chatterbox',
       type: 'POST',
@@ -73,14 +78,52 @@ var app = {
 
 $(document).ready(function(){
   app.username = window.location.search.split("=")[1];
-  app.initialize();
+  app.init();
 
   $('.send-message').on('keydown', function(e){
     if (e.keyCode === 13) {
-      app.createJSONMessage();
-      app.postJSON();
+      app.createJSON();
+      app.send();
       $(this).val('');
     }
+  });
+
+  $('.create-room').on('keydown', function(e){
+    if (e.keyCode === 13) {
+
+      var room = '<div class="separate"><li><a href="#">'
+                 + $(this).val()
+                 +'</a></li><button class="delete">x'
+                 +'</button></div>';
+
+      $('#rooms-list').append(room);
+      $(this).val('');
+    }
+  });
+
+  $(document).on('click', '.delete', function(e){
+    $(this).parent().remove();
+    app.friends.splice(app.friends.indexOf($(this).parent().first('li').text()), 1)
+  });
+
+  // TODO: FIX ADDING FRIENDS REPEATEDLY
+  $(document).on('click', 'section a', function(e){
+    var friend = '<div class="separate"><li>'
+               + $(this).text()
+               +'</li><button class="delete">x'
+               +'</button></div>';
+
+    // if (!$('#friends-list').contains($(this).text())) {
+      $('#friends-list').append(friend);
+      app.friends.push($(this).text());
+    // }
+    // if (!$.contains($('#friends-list'), $(this))) {
+    //   $('#friends-list').append(friend);
+    // }
+    //
+    // if (!$('#friends-list:contains('+$(this).text()+')')) {
+    //   $('#friends-list').append(friend);
+    // }
   });
 
 });
